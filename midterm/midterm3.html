@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+
+<script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w, canvas.height = h;
+    canvas.style.width = w + "px", canvas.style.height = h + "px";
+    document.body.style.margin = "0px", canvas.style.display = "block"
+    
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width *= dpr, canvas.height *= dpr;
+    ctx.scale(dpr, dpr);
+
+    const colors = ["orange", "red", "gold", "yellow", "green", "blue", "purple"];
+    const fishes = [];
+
+    function addFish(x, y) {
+        const leftorright = Math.random() < 0.5 ? -1 : 1;
+        fishes.push({ 
+            x: x, 
+            y: y,
+            leftorright: leftorright, 
+            scale: Math.random() * 0.5 + 0.5,
+            vx: leftorright * (Math.random() * 2 + 1), 
+            color: colors[Math.floor(Math.random() * colors.length)] });
+    }
+
+    function drawFish(x, y, scale, leftorright, color) {
+        
+        const s = w * 0.03 * scale;
+
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "black";
+
+        ctx.beginPath();
+        ctx.moveTo(x - 1.8 * s * leftorright, y);
+        ctx.lineTo(x - 3.2 * s * leftorright, y - 1.0 * s);
+        ctx.lineTo(x - 3.2 * s * leftorright, y + 1.0 * s);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x - 0.6 * s * leftorright, y - 1.1 * s);
+        ctx.lineTo(x + 0.2 * s * leftorright, y - 2.0 * s);
+        ctx.lineTo(x + 0.9 * s * leftorright, y - 1.0 * s);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.ellipse(x, y, 2 * s, 1.2 * s, 0, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(x + 1.2 * s * leftorright, y - 0.35 * s, 0.25 * s, 0, Math.PI * 2);
+        ctx.fillStyle = "white";
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(x + 1.3 * s * leftorright, y - 0.35 * s, 0.1 * s, 0, Math.PI * 2);
+        ctx.fillStyle = "black";
+        ctx.fill();
+
+    }
+
+    function draw() {
+        ctx.fillStyle = "lightblue";
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.fillStyle = "#e8d49a";
+        ctx.fillRect(0, h * 0.9, w, h * 0.1);
+
+        for (const fish of fishes) {
+            const leftorright = fish.vx < 0 ? -1 : 1;
+            drawFish(fish.x, fish.y, fish.scale, leftorright, fish.color);
+            }
+        }
+
+    for (let i = 0; i < 5; i++) {
+        addFish(Math.random() * w, Math.random() * h * 0.8);
+    }
+
+    function tick() {
+        const margin = w * 0.1;
+        for (const fish of fishes) {
+            fish.x += fish.vx;
+            if ((fish.x < margin && fish.vx < 0) || (fish.x > w - margin && fish.vx > 0)) {
+                fish.vx *= -1;
+            }
+        }
+        draw();
+        requestAnimationFrame(tick);
+    }
+
+    tick();
+
+    canvas.addEventListener("click", (e) => {
+    addFish(e.offsetX, e.offsetY);
+});
+
+
+</script>
